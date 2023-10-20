@@ -46,24 +46,8 @@ module.exports = function() {
     let res = "";
     await this.wait(5);
     try {
-      const propertyValue = await await this.grabAttributeFrom(element, attrib);
-      console.log(propertyValue);
-      if (bordertype === "border-top") {
-        await this.assertStringIncludes(propertyValue.borderTop, bordervalue);
-      } else if (bordertype === "border-bottom") {
-        await this.assertStringIncludes(propertyValue.borderBottom, bordervalue);
-      } else if (bordertype === "border-left") {
-        console.log(propertyValue.borderLeft);
-        await this.assertStringIncludes(propertyValue.borderLeft, bordervalue);
-      } else if (bordertype === "border-right") {
-        await this.assertStringIncludes(propertyValue.borderRight, bordervalue);
-      } else if (bordertype === "border-width") {
-        await this.assertStringIncludes(propertyValue.borderWidth, bordervalue);
-      } else if (bordertype === "border-color") {
-        await this.assertStringIncludes(propertyValue.borderColor, bordervalue);
-      } else if (bordertype === "border-style") {
-        await this.assertStringIncludes(propertyValue.borderStyle, bordervalue);
-      }
+      const propertyValue = await this.extractstyleattributevalue(element,bordertype);
+      await this.assert(propertyValue, bordervalue);
       res = "pass";
     } catch (err) {
       res = "fail";
@@ -71,6 +55,21 @@ module.exports = function() {
     return res;
   },
 
+  async extractstyleattributevalue(ele, attrib) {
+    const attrtype = "style";   
+    const propertyValue = await this.grabAttributeFrom(ele, attrtype);
+    const styleattArray = propertyValue.split(";");
+    let i = 0;
+    let attribValue = "";
+    for (i = 0; i < styleattArray.length; i++) {
+      if (styleattArray[i].includes(attrib) > 0) {
+        attribValue = styleattArray[i].replace(`${attrib}:`, "").trim();
+        console.log(attribValue);
+        break;
+      }
+    }
+    return attribValue;
+  },
 
   });
 }
